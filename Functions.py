@@ -1,26 +1,41 @@
-#Function to perform addition of two numbers
-def add(number1, number2): 
-    return (number1 + number2) 
-  
-#Function to perform subtraction of two numbers
-def subtract(number1, number2): 
-    return (number1 - number2)
-  
-#Function to perform multiplication of two numbers 
-def multiply(number1, number2): 
-    return (number1 * number2) 
-  
-#Function to perform division of two numbers 
-def divide(number1, number2): 
-    return (number1 / number2)
+"""
+Functions for basic calculator operations with type validation.
 
-#Function to perform modulus remainder
-def mod(number1, number2):
-    return (number1 % number2)
+This module exports add, subtract, multiply, divide. It accepts ints/floats (or
+numeric strings) and returns a float when needed. divide() raises ZeroDivisionError
+for division by zero. All functions raise TypeError for non‑numeric inputs.
+"""
+from typing import Union
 
-#Function too perform x to the y power
-def exponent(number1, number2):
-    ans = 1
-    for _ in range(0,number2):
-        ans *= number1
-    return ans
+Number = Union[int, float]
+
+def _to_number(x) -> Number:
+    """Best-effort conversion of x to a number (int if possible, else float)."""
+    if isinstance(x, (int, float)):
+        return x
+    if isinstance(x, str):
+        try:
+            if x.strip().isdigit() or (x.strip().startswith('-') and x.strip()[1:].isdigit()):
+                return int(x)
+            return float(x)
+        except ValueError as e:
+            raise TypeError(f"Value {x!r} is not a number") from e
+    raise TypeError(f"Unsupported type {type(x).__name__}; expected number or numeric string.")
+
+def add(a: Number, b: Number) -> Number:
+    a, b = _to_number(a), _to_number(b)
+    return a + b
+
+def subtract(a: Number, b: Number) -> Number:
+    a, b = _to_number(a), _to_number(b)
+    return a - b
+
+def multiply(a: Number, b: Number) -> Number:
+    a, b = _to_number(a), _to_number(b)
+    return a * b
+
+def divide(a: Number, b: Number) -> float:
+    a, b = _to_number(a), _to_number(b)
+    if b == 0:
+        raise ZeroDivisionError("Cannot divide by zero")
+    return a / b
